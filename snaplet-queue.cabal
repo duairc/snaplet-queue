@@ -1,0 +1,55 @@
+name:           snaplet-queue
+version:        0.1
+synopsis:       Asynchronously queue tasks in web handlers to be executed later
+license:        MPL-2.0
+license-file:   LICENSE
+author:         Shane O'Brien
+maintainer:     shane@duairc.com
+stability:      Experimental
+category:       Web
+cabal-version:  >= 1.6
+build-type:     Simple
+homepage:       https://github.com/duairc/snaplet-queue
+bug-reports:    https://github.com/duairc/snaplet-queue/issues
+
+extra-source-files:
+  LICENSE
+
+library
+  include-dirs:
+    include
+
+  hs-source-dirs:
+    src
+
+  exposed-modules:
+    Snap.Snaplet.Queue
+    Control.Monad.Task
+
+  other-modules:
+    Control.Monad.Trans.Lens
+    Control.Monad.Trans.Log
+    Control.Monad.Trans.Task
+    Monad.Lens
+    Monad.Log
+
+  build-depends:
+    base,
+    bytestring,
+    layers,
+    lens,
+    mtl,
+    snap,
+    snap-core,
+    stm,
+    text,
+    transformers
+
+  if impl(ghc >= 7.10)
+    cpp-options: -DOverlapPragma -DOverlappingInstances=NoImplicitParams
+
+  ghc-options: -Wall
+
+source-repository head
+  type:     git
+  location: https://github.com/duairc/snaplet-queue.git
