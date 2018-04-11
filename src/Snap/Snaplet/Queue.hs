@@ -1,17 +1,16 @@
-{-# LANGUAGE CPP #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module Snap.Snaplet.Queue
-    ( Queue, initQueue, enqueue, enqueueTop
+    ( Queue, initQueue, asynchronously, asynchronouslyTop, synchronously
     )
 where
 
 -- base ----------------------------------------------------------------------
 import           Control.Concurrent (forkIO, getNumCapabilities)
-import           Control.Monad (forever, replicateM_)
+import           Control.Monad ((>=>), forever, replicateM_)
 import           Control.Monad.IO.Class (liftIO)
 
 
@@ -50,23 +49,29 @@ initQueue = makeSnaplet "Queue" description Nothing $ liftIO $ do
     replicateM_ n $ forkIO (go queue)
     pure $ Queue queue
   where
-    description = "Asynchronously queue tasks in web handlers to be executed later."
+    description = "Asynchronously queue tasks in web handlers to be executed\
+        \ later."
     go queue = forever $ do
         io <- atomically $ readTChan queue
         io
 
 
 ------------------------------------------------------------------------------
-enqueue :: SnapletLens v Queue -> Task b v () -> Handler b v ()
-enqueue lens action = do
+asynchronously :: SnapletLens v Queue -> Task b v () -> Handler b v ()
+asynchronously lens action = do
     Queue queue <- with lens ask
     io <- task $ logErrors action
     liftIO $ atomically $ writeTChan queue io
 
 
 ------------------------------------------------------------------------------
-enqueueTop :: SnapletLens b Queue -> Task b v () -> Handler b v ()
-enqueueTop lens action = do
+asynchronouslyTop :: SnapletLens b Queue -> Task b v () -> Handler b v ()
+asynchronouslyTop lens action = do
     Queue queue <- withTop lens ask
     io <- task $ logErrors action
     liftIO $ atomically $ writeTChan queue io
+
+
+------------------------------------------------------------------------------
+synchronously :: Task b v a -> Handler b v a
+synchronously = task >=> liftIO
