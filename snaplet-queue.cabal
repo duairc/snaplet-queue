@@ -38,12 +38,14 @@ library
     bytestring,
     layers,
     lens,
+    monad-control,
     mtl,
     snap,
     snap-core,
     stm,
     text,
-    transformers
+    transformers,
+    transformers-base
 
   if impl(ghc >= 7.10)
     cpp-options: -DOverlapPragma -DOverlappingInstances=NoImplicitParams

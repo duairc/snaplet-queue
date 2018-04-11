@@ -1,7 +1,9 @@
 {-# LANGUAGE CPP #-}
+{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE UndecidableInstances #-}
 
 module Control.Monad.Task
     ( Task
@@ -32,6 +34,7 @@ import           Data.ByteString (ByteString)
 
 -- layers --------------------------------------------------------------------
 import           Control.Monad.Lift
+import           Control.Monad.Lift.IO (liftIO, liftControlIO, resumeIO)
 import           Monad.Abort (MonadAbort)
 import           Monad.Fork (MonadFork)
 import           Monad.Mask (MonadMask)
@@ -45,6 +48,12 @@ import           Monad.Try (MonadTry, mtry)
 -- mtl -----------------------------------------------------------------------
 import qualified Control.Monad.Reader.Class as MTL
 import qualified Control.Monad.State.Class as MTL
+
+
+-- monad-control -------------------------------------------------------------
+import           Control.Monad.Trans.Control
+                     ( MonadBaseControl, StM, liftBaseWith, restoreM
+                     )
 
 
 -- snap ----------------------------------------------------------------------
@@ -61,6 +70,10 @@ import           Monad.Log (MonadLog)
 import qualified Monad.Log as G
 import           Monad.Lens (MonadLens)
 import qualified Monad.Lens as L
+
+
+------------------------------------------------------------------------------
+import           Control.Monad.Base (MonadBase, liftBase)
 
 
 ------------------------------------------------------------------------------
@@ -105,6 +118,18 @@ instance MonadInnerInvariant IO (Task b v) IO (Task b v) where
 ------------------------------------------------------------------------------
 instance MonadInnerFunctor IO (Task b v) IO (Task b v) where
     hoistI = defaultHoistI
+
+
+------------------------------------------------------------------------------
+instance MonadBase IO (Task b v) where
+    liftBase = liftIO
+
+
+------------------------------------------------------------------------------
+instance MonadBaseControl IO (Task b v) where
+    type StM (Task b v) a = OuterEffects IO (Task b v) a
+    liftBaseWith = liftControlIO
+    restoreM = resumeIO
 
 
 ------------------------------------------------------------------------------
