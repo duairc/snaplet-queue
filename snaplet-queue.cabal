@@ -44,9 +44,6 @@ library
     transformers,
     transformers-base
 
-  if impl(ghc >= 7.10)
-    cpp-options: -DOverlapPragma -DOverlappingInstances=NoImplicitParams
-
   ghc-options: -Wall
 
 source-repository head
