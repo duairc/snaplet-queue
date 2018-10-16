@@ -1,11 +1,8 @@
-{-# LANGUAGE CPP #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE OverlappingInstances #-}
 {-# LANGUAGE UndecidableInstances #-}
-
-#include "overlap.h"
 
 module Monad.Log
     ( MonadLog, log
@@ -54,7 +51,7 @@ instance MonadInner i m => MonadLog (LogT i m) where
 
 
 ------------------------------------------------------------------------------
-instance __OVERLAPPABLE__ (MonadTrans t, MonadLog m, Monad (t m)) =>
+instance {-# OVERLAPPABLE #-} (MonadTrans t, MonadLog m, Monad (t m)) =>
     MonadLog (t m)
   where
     log = lift . log

@@ -1,12 +1,9 @@
-{-# LANGUAGE CPP #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE FunctionalDependencies #-}
 {-# LANGUAGE OverlappingInstances #-}
 {-# LANGUAGE UndecidableInstances #-}
-
-#include "overlap.h"
 
 module Monad.Lens
     ( MonadLens, getLens
@@ -53,7 +50,7 @@ instance Monad m => MonadLens b v (LensT b v m) where
 
 
 ------------------------------------------------------------------------------
-instance __OVERLAPPABLE__ (MonadTrans t, MonadLens b v m, Monad (t m)) =>
+instance {-# OVERLAPPABLE #-} (MonadTrans t, MonadLens b v m, Monad (t m)) =>
     MonadLens b v (t m)
   where
     getLens = lift getLens

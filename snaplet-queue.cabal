@@ -16,9 +16,6 @@ extra-source-files:
   LICENSE
 
 library
-  include-dirs:
-    include
-
   hs-source-dirs:
     src
 
